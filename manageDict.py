@@ -12,6 +12,7 @@ class MyGui(QMainWindow):
         ui_path = os.path.join(os.path.dirname(__file__), 'ui/dictManage.ui')
         ico_path = os.path.join(os.path.dirname(__file__), 'ui/maple-leaf.png')
         loadUi(ui_path, self)  # 请用qt-designer随意编辑ui
+        self.setWindowIcon(QtGui.QIcon(ico_path))
         self.show()
 
 
