@@ -1,1 +1,9 @@
-American Heritage Dictionary 4th.mdx
+*.mdd
+*.mdx
+*.db
+
+
+__pycache__
+temp
+.idea
+content
