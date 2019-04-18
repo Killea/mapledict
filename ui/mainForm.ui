@@ -74,19 +74,9 @@
              </property>
              <column>
               <property name="text">
-               <string>5 items</string>
+               <string> </string>
               </property>
              </column>
-             <item>
-              <property name="text">
-               <string>test</string>
-              </property>
-              <item>
-               <property name="text">
-                <string>tset</string>
-               </property>
-              </item>
-             </item>
             </widget>
            </item>
            <item>

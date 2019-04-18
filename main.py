@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, uic,QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow,QTreeWidgetItem
 import codecs, os
 from PyQt5.QtWebEngineWidgets import *
 
@@ -8,10 +8,12 @@ from PyQt5.uic import loadUi
 from PyQt5.QtCore import QUrl
 from mdict_query import IndexBuilder
 
+all_dict =list()
 
 class MyGui(QMainWindow):
 
     def start_check_dict(self):
+        
         content_folder = os.path.join(os.path.dirname(__file__), "content")
         if not os.path.isdir(content_folder):
             os.mkdir(content_folder)
@@ -20,17 +22,52 @@ class MyGui(QMainWindow):
             os.mkdir(temp_folder)
         
         for root, dirs, files in os.walk(content_folder):   
-          print( files)
+          print( root,dirs,files)
+          for d in files:
+              if d.lower().endswith('.mdx'):
+                  all_dict.append(root+'/'+d)
 
+
+        print(all_dict)
     def on_changeWord(self):
         # print(i,self.comboBox.currentText())
         print( os.path.join(os.path.dirname(__file__),  "content/OALD8.mdx"))
+        self.treeWidget.clear()
+        root = QTreeWidgetItem(self.treeWidget)
+        root.setText(0, self.comboBox.currentText())  
 
 
-        builder = IndexBuilder( os.path.join(os.path.dirname(__file__), "content/OALD8.mdx"))
-        
+        result_text=''
+        for d in all_dict:
 
-        result_text = builder.mdx_lookup(self.comboBox.currentText())
+            builder = IndexBuilder(d)
+            result_list =  builder.mdx_lookup(self.comboBox.currentText())
+
+
+             
+            # /__playsound.png 
+            #bytes_list = builder.mdd_lookup(r'//__playsound.png ')
+            #print ( 'bytes_list', bytes_list)
+            bytes_list= builder.get_mdd_keys()
+
+            
+            
+            print('your_file', d )
+            with open(d+'your_file.txt', 'w') as f:
+              for item in bytes_list:
+                f.write("%s\n" % item)
+
+            if result_list[0]!='':
+              result_text +=result_list[0]
+              child = QTreeWidgetItem(root)
+              child.setText(0, os.path.basename(d))
+             
+         
+
+
+
+        #builder = IndexBuilder( os.path.join(os.path.dirname(__file__), "content/OALD8.mdx"))
+        #result_text = builder.mdx_lookup(self.comboBox.currentText())
         print(result_text)
         # QApplication.processEvents()
         if result_text != '':
@@ -38,10 +75,10 @@ class MyGui(QMainWindow):
             file_path = os.path.abspath(os.path.join(tempFolder, "dict.html"))
             file_path = file_path.replace('\\', '/')
             with codecs.open(file_path, "w", "utf-8-sig") as text_file:
-                text_file.write(result_text[0])
+                text_file.write(result_text)
             print(file_path)
             self.widget_2.load(QUrl('file://'+file_path))
-
+        self.treeWidget.expandAll()    
     def __init__(self):
         super().__init__()
         ui_path = os.path.join(os.path.dirname(__file__), 'ui/mainForm.ui')
