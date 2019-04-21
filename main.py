@@ -12,20 +12,27 @@ from PyQt5.QtCore import QUrl,QObject, pyqtSlot
 from mdict_query import IndexBuilder
 from sys import platform
 all_dict =list()
-
+win = None
 
 class CallHandler(QObject): 
     @pyqtSlot(str,result=str)
     def myTest(self,test):
         print (test)
+        test =test.strip()
+        if test!='':
+          print(test)
+          win.look_up_word(test)
         #return test +'来自pyQT'
+    @pyqtSlot(str,result=str)
+    def myMouseClick(self,test):
+      print (test)
 
 
-
-
+    #return test +'来自pyQT'
 
 channel = QWebChannel()
 handler = CallHandler()
+channel.registerObject('pyjs', handler)
 
 class MyGui(QMainWindow):
 
@@ -45,9 +52,12 @@ class MyGui(QMainWindow):
                   all_dict.append(root+'/'+d)
 
         print(all_dict)
-    def on_changeWord(self):
+    def on_changeWord(self, word):
+      self.look_up_word('')
+
+    def look_up_word(self, word):
         # print(i,self.comboBox.currentText())
-        print( os.path.join(os.path.dirname(__file__),  "content/OALD8.mdx"))
+       
         self.treeWidget.clear()
         root = QTreeWidgetItem(self.treeWidget)
         root.setText(0, self.comboBox.currentText())  
@@ -59,23 +69,35 @@ class MyGui(QMainWindow):
         <head>
             <meta charset="utf-8" />
             <script type="text/javascript" src="qwebchannel.js"></script>
+            <script type="text/javascript" src="jquery-3.4.0.min.js"></script>
             <title>QWebChannel测试</title>
             <script>
                 window.onload = function () {
                     new QWebChannel(qt.webChannelTransport, function (channel) {
                         window.pyjs = channel.objects.pyjs;   
                     });
+
+					$('a').mouseover(function() {
+                    var url = $(this).attr('href');
+                    var style = "position: fixed; left: 0; bottom: 0; z-index: 1000000;";
+                    $('body').append("<b id='urlDisplay' style='" + style + "'>" + url + "</b>");
+                    });
+                    $('a').mouseout(function() { $('#urlDisplay').remove(); });
                 }
             </script>
         </head>
         <body>
+        <div ondblclick="qt5test();" onclick= "qt5MouseClick();">
         '''
-
+        print( 'word = ', word)
+        if word=='':
+          word= self.comboBox.currentText()
         for d in all_dict:
 
             builder = IndexBuilder(d)
             #html content
-            html_content_list =  builder.mdx_lookup(self.comboBox.currentText())
+
+            html_content_list =  builder.mdx_lookup(word)
             
 
             #print(self.comboBox.currentText(), d , result_list)
@@ -93,7 +115,7 @@ class MyGui(QMainWindow):
             sound_list=list()
             pix_list=list()
             if len(html_content_list)>0:
-              print(html_content_list[0])
+              #print(html_content_list[0])
               soup = BeautifulSoup( html_content_list[0],"html.parser"  )
               for link in soup.find_all('a'):
                 tmp = link.get('href')
@@ -118,8 +140,6 @@ class MyGui(QMainWindow):
                   with open(os.path.join(os.path.dirname(__file__),  "temp/"+file), "wb") as binary_file:
                     binary_file.write(bytes_list[0])
 
-
-
               
               if html_content_list[0]!='':
                 html_string +=html_content_list[0]
@@ -134,16 +154,29 @@ class MyGui(QMainWindow):
 
         if html_string != '':
             html_string += '''
-            <div onclick="qt5test();">测试</div> 
+           </div> 
             <script>
+
+            function getSelectionText() {
+                var text = "";
+                if (window.getSelection) {
+                    text = window.getSelection().toString();
+                } else if (document.selection && document.selection.type != "Control") {
+                    text = document.selection.createRange().text;
+                }
+                return text;
+            }
+
             function qt5test() {
-            pyjs.myTest('这是测试传参的',function (res) {
+            pyjs.myTest(getSelectionText(),function (res) {
             });
             }
 
-             function uptext(msg) {
-                 document.getElementById('test').innerHTML=msg;
-             }
+            function qt5MouseClick() {
+            pyjs.myMouseClick('qt5MouseClick()',function (res) {
+            });
+            }
+
             </script>
             </body>
             </html>
@@ -154,7 +187,7 @@ class MyGui(QMainWindow):
             with codecs.open(file_path, "w", "utf-8-sig") as text_file:
                 text_file.write(html_string)
             print(file_path)
-            channel.registerObject('pyjs', handler)
+            #channel.registerObject('pyjs', handler)
 
             self.widget_2.page().setWebChannel(channel)
      
@@ -191,6 +224,7 @@ class MyGui(QMainWindow):
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
+    
     win = MyGui()
     #sys.exit(app.exec_())
 
