@@ -37,8 +37,11 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
-           <string>Search</string>
+           <string>go</string>
           </property>
          </widget>
         </item>
@@ -74,7 +77,7 @@
              </property>
              <column>
               <property name="text">
-               <string> </string>
+               <string/>
               </property>
              </column>
             </widget>
@@ -104,7 +107,7 @@
      <x>0</x>
      <y>0</y>
      <width>1019</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="nativeMenuBar">

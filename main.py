@@ -1,34 +1,53 @@
 #This is the main script, run from here
 from PyQt5 import QtCore, uic,QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow,QTreeWidgetItem
-import codecs, os
+import codecs, os, sys, base64, shutil
 from PyQt5.QtWebEngineWidgets import *
 from bs4 import BeautifulSoup
 from PyQt5.QtWebChannel import QWebChannel
-
 from readmdict import MDX, MDD
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import QUrl,QObject, pyqtSlot
 from mdict_query import IndexBuilder
 from sys import platform
 all_dict =list()
-win = None
+win = None #win = MyGui()
+
+def empty_temp():
+  folder = os.path.join(os.path.dirname(__file__),  "temp/")
+  for the_file in os.listdir(folder):
+      file_path = os.path.join(folder, the_file)
+      try:
+          if os.path.isfile(file_path):
+              os.unlink(file_path)
+          #elif os.path.isdir(file_path): shutil.rmtree(file_path)
+      except Exception as e:
+          print(e)
+  
 
 class CallHandler(QObject): 
-    @pyqtSlot(str,result=str)
+    @pyqtSlot(str)
     def myTest(self,test):
         print (test)
         test =test.strip()
         if test!='':
           print(test)
           win.look_up_word(test)
-        #return test +'来自pyQT'
+
     @pyqtSlot(str,result=str)
     def myMouseClick(self,test):
       print (test)
 
+    @pyqtSlot(str)
+    def playSound(self,spxfile): 
+      with open(os.path.join(os.path.dirname(__file__),  "temp/"+spxfile ), 'rb') as f:
+        data = f.read()
+        data_base64=  base64.b64encode(data)
+        data_base64_string = data_base64.decode()
+        #print(data_base64_string)
+        win.widget_2.page().runJavaScript('decodeFile(`'+ data_base64_string +'`);')
 
-    #return test +'来自pyQT'
+
 
 channel = QWebChannel()
 handler = CallHandler()
@@ -57,37 +76,29 @@ class MyGui(QMainWindow):
 
     def look_up_word(self, word):
         # print(i,self.comboBox.currentText())
-       
+  
         self.treeWidget.clear()
         root = QTreeWidgetItem(self.treeWidget)
         root.setText(0, self.comboBox.currentText())  
-
-        #html_string='<script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>'
+        empty_temp()
         html_string ='''
         <!DOCTYPE html>
         <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
         <head>
             <meta charset="utf-8" />
-            <script type="text/javascript" src="qwebchannel.js"></script>
-            <script type="text/javascript" src="jquery-3.4.0.min.js"></script>
+            <script type="text/javascript" src="jpemartins-speex.js-a6bbdfd/qwebchannel.js"></script>
+            <script type="text/javascript" src="jpemartins-speex.js-a6bbdfd/jquery-3.4.0.min.js"></script>
             <title>QWebChannel测试</title>
             <script>
                 window.onload = function () {
                     new QWebChannel(qt.webChannelTransport, function (channel) {
                         window.pyjs = channel.objects.pyjs;   
                     });
-
-					$('a').mouseover(function() {
-                    var url = $(this).attr('href');
-                    var style = "position: fixed; left: 0; bottom: 0; z-index: 1000000;";
-                    $('body').append("<b id='urlDisplay' style='" + style + "'>" + url + "</b>");
-                    });
-                    $('a').mouseout(function() { $('#urlDisplay').remove(); });
                 }
             </script>
         </head>
         <body>
-        <div ondblclick="qt5test();" onclick= "qt5MouseClick();">
+        <div ondblclick="qt5test();" >
         '''
         print( 'word = ', word)
         if word=='':
@@ -117,12 +128,18 @@ class MyGui(QMainWindow):
             if len(html_content_list)>0:
               #print(html_content_list[0])
               soup = BeautifulSoup( html_content_list[0],"html.parser"  )
+
+
               for link in soup.find_all('a'):
                 tmp = link.get('href')
                 if tmp.startswith('sound://'):
                     sound_list.append(tmp.replace('sound://',''))
+                    link['sound']= tmp.replace('sound://','')
+                    link['href']= "javascript:"
+                    link['onclick']="javascript:playSound(this);"
+                    print(link['href'])
 
-
+                
               for link in soup.find_all('img'):
                 tmp = link.get('src')
                 if tmp.startswith('/'):
@@ -131,18 +148,22 @@ class MyGui(QMainWindow):
                   pix_list.append(tmp)  
 
               pix_list =list(set(pix_list))
-              
-        
-              print(pix_list)
-              for file in pix_list:
+              file_list= sound_list + pix_list
+              for file in file_list:
                 bytes_list = builder.mdd_lookup('\\'+file)
                 if len(bytes_list)>0:
                   with open(os.path.join(os.path.dirname(__file__),  "temp/"+file), "wb") as binary_file:
                     binary_file.write(bytes_list[0])
-
               
+
+              # 1st line:  <a href="sound://GB_ld45boot.spx" ><img src="snd_uk.png" style="margin-bottom:-4px" border="0" ></img></a> 
+              # 2nd line:  <a onclick="javascript:qt5test(this);" href="javascript:" sound = "GB_boo_interjecti0205.spx" ><img src="snd_uk.png" style="margin-bottom:-4px" border="0" ></img></a>
+              #modify the 1st to the 2nd line style
+ 
               if html_content_list[0]!='':
-                html_string +=html_content_list[0]
+                #html_string +=html_content_list[0]
+        
+                html_string += str(soup)
                 child = QTreeWidgetItem(root)
                 child.setText(0, os.path.basename(d))
              
@@ -153,34 +174,120 @@ class MyGui(QMainWindow):
         # QApplication.processEvents()
 
         if html_string != '':
-            html_string += '''
-           </div> 
-            <script>
+            html_string += '''</div> 
+               <script src="jpemartins-speex.js-a6bbdfd/public/js/lib/xaudio.js"></script>
+               <script src="jpemartins-speex.js-a6bbdfd/public/js/lib/pcmdata.min.js"></script>
+               <script src="jpemartins-speex.js-a6bbdfd/public/js/lib/swfobject.js"></script>
+               <script src="jpemartins-speex.js-a6bbdfd/public/js/lib/usertiming.js"></script>
+               <script src="jpemartins-speex.js-a6bbdfd/public/js/lib/bitstring.js"></script>
+               <script src="jpemartins-speex.js-a6bbdfd/public/js/lib/mediacapture.js"></script>
+               <script src="jpemartins-speex.js-a6bbdfd/dist/speex.min.js"></script>
+               <script src="jpemartins-speex.js-a6bbdfd/public/js/audio.js"></script>
+               <script src="jpemartins-speex.js-a6bbdfd/public/js/application.js"></script>
+              <script>
+                   function playSound(obj) {
+                          pyjs.playSound(obj.getAttribute('sound'))
+                           }
+               
+                           function qt5test() {
+                           pyjs.myTest(getSelectionText(),function (res) {
+                           });
+                           }
 
-            function getSelectionText() {
-                var text = "";
-                if (window.getSelection) {
-                    text = window.getSelection().toString();
-                } else if (document.selection && document.selection.type != "Control") {
-                    text = document.selection.createRange().text;
-                }
-                return text;
-            }
+              
+              function getSelectionText() {
+                               var text = "";
+                               if (window.getSelection) {
+                                   text = window.getSelection().toString();
+                               } else if (document.selection && document.selection.type != "Control") {
+                                   text = document.selection.createRange().text;
+                               }
+                               return text;
+                           }
+               
 
-            function qt5test() {
-            pyjs.myTest(getSelectionText(),function (res) {
-            });
-            }
+               
+                           var myurl
+                           $('a').mouseover(function() {
+                           myurl =$(this).attr('href')
+                           });
+                            $('a').mouseout(function() { myurl = '' });
+               
+                           function qt5MouseClick() {
+                            pyjs.myMouseClick( myurl ,function (res) {  
+                           });
+                           }        
+                   const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
+               	const byteCharacters = atob(b64Data);
+               	const byteArrays = [];
+               	for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+               	  const slice = byteCharacters.slice(offset, offset + sliceSize);
+                 
+               	  const byteNumbers = new Array(slice.length);
+               	  for (let i = 0; i < slice.length; i++) {
+               		byteNumbers[i] = slice.charCodeAt(i);
+               	  }
+               	  const byteArray = new Uint8Array(byteNumbers);
+               	  byteArrays.push(byteArray);
+               	}
+               	const blob = new Blob(byteArrays, {type: contentType});
+               	return blob;
+                 }
+                  function decodeFile(bufSpx) {
+                   const bin = b64toBlob(bufSpx, '');
+                   console.log(bin)
+                   var arrayBuffer;
+                 var fileReader = new FileReader();
+                 fileReader.onload = function(event) {
+                   arrayBuffer = event.target.result;
+                   console.log(event.target.result )
+                   var stream, samples, st;
+               	var ogg, header, err;
+                 
+                   ogg = new Ogg(arrayBuffer, {file: true});
+                   
+               	ogg.demux();
+               	stream = ogg.bitstream();
+                 
+               	header = Speex.parseHeader(ogg.frames[0]);
+               	console.log(header);
+                 
+               	comment = new SpeexComment(ogg.frames[1]);
+               	console.log(comment.data);
+                 
+               	st = new Speex({
+               	  quality: 8,
+               	  mode: header.mode,
+               	  rate: header.rate
+               	});
+                 
+               	samples = st.decode(stream, ogg.segments);
+                 
+               	var waveData = PCMData.encode({
+               		sampleRate: header.rate,
+               		channelCount: header.nb_channels,
+               		bytesPerSample: 2,
+               		data: samples
+               	  });
+                 
+               	  Speex.util.play(samples,  header.rate);  
+               
+               	// array buffer holding audio data in wav codec
+               	var bufWav = Speex.util.str2ab(waveData);
+               	// convert to a blob object
+               	var blob = new Blob([bufWav], {type: "audio/wav"});
+               	// return a "blob://" url which can be used as a href anywhere
+               	return URL.createObjectURL(blob);
+               };
+               fileReader.readAsBinaryString(bin);
+               }
 
-            function qt5MouseClick() {
-            pyjs.myMouseClick('qt5MouseClick()',function (res) {
-            });
-            }
+            
+               </script>
 
-            </script>
-            </body>
-            </html>
-            '''
+               </body>
+                 </html>
+             '''
             tempFolder = os.path.join(os.path.dirname(__file__), "temp")
             file_path = os.path.abspath(os.path.join(tempFolder, "dict.html"))
             file_path = file_path.replace('\\', '/')
@@ -202,32 +309,18 @@ class MyGui(QMainWindow):
                 self.widget_2.load(QUrl(file_path))
             self.treeWidget.expandAll()  
             self.widget_2.show()
-
-
-            
-
-
     def __init__(self):
         super().__init__()
         ui_path = os.path.join(os.path.dirname(__file__), 'ui/mainForm.ui')
         ico_path = os.path.join(os.path.dirname(__file__), 'ui/maple-leaf.png')
-        loadUi(ui_path, self)  # 请用qt-designer随意编辑ui
+        loadUi(ui_path, self)  
         self.start_check_dict()
-        # self.pushButton.setObjectName('pushButton')
-        # self.pushButton.clicked.connect(self.on_click)
-        #self.widget_2.setEnabled(False)
         self.comboBox.currentIndexChanged.connect(self.on_changeWord)
         self.setWindowIcon(QtGui.QIcon(ico_path))
         self.show()
         
-
 if __name__ == "__main__":
-    import sys
     app = QApplication(sys.argv)
-    
     win = MyGui()
     #sys.exit(app.exec_())
-
-  
-
     app.exec_()
