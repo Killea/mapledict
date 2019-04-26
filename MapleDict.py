@@ -135,20 +135,23 @@ class MyGui(QMainWindow):
 
                 for link in soup.find_all('a'):
                     tmp = link.get('href')
-                    if tmp.startswith('sound://'):
-                        sound_list.append(tmp.replace('sound://', ''))
-                        link['sound'] = tmp.replace('sound://', '')
-                        link['href'] = "javascript:"
-                        link['onclick'] = "javascript:playSound(this);"
-                        print(link['href'])
+                    print(tmp)
+                    if tmp is not None:
+                      if tmp.startswith('sound://'):
+                          sound_list.append(tmp.replace('sound://', ''))
+                          link['sound'] = tmp.replace('sound://', '')
+                          link['href'] = "javascript:"
+                          link['onclick'] = "javascript:playSound(this);"
+                          print(link['href'])
 
                 for link in soup.find_all('img'):
                     tmp = link.get('src')
-                    if tmp.startswith('/'):
-                        pix_list.append(tmp.replace('/', ''))
-                        link['src'] = tmp.replace('/', '')
-                    else:
-                        pix_list.append(tmp)
+                    if tmp is not None:
+                      if tmp.startswith('/') and tmp is not None:
+                          pix_list.append(tmp.replace('/', ''))
+                          link['src'] = tmp.replace('/', '')
+                      else:
+                          pix_list.append(tmp)
 
                 pix_list = list(set(pix_list))
                 file_list = sound_list + pix_list
