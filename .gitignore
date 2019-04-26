@@ -11,4 +11,6 @@ content/*
 !content/gcide.mdx.db
 build
 dist
+.vscoce
+
 

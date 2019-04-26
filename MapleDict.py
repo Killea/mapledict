@@ -40,6 +40,9 @@ class CallHandler(QObject):
     def myMouseClick(self, test):
         print(test)
 
+        
+        
+
     @pyqtSlot(str)
     def playSound(self, spxfile):
         with open(os.path.join(os.path.dirname(__file__), "temp/" + spxfile), 'rb') as f:
@@ -56,6 +59,9 @@ channel.registerObject('pyjs', handler)
 
 
 class MyGui(QMainWindow):
+    def on_search_click(self):
+        print('click')
+        win.widget_2.page().runJavaScript('QTscrollTo("part1")')
 
     def start_check_dict(self):
 
@@ -117,7 +123,7 @@ class MyGui(QMainWindow):
 
             # print(self.comboBox.currentText(), d , result_list)
 
-            # /__playsound.png 
+         
             # print ( 'bytes_list', bytes_list)
             # bytes_list= builder.get_mdd_keys()
             '''
@@ -167,7 +173,7 @@ class MyGui(QMainWindow):
 
                 if html_content_list[0] != '':
                     # html_string +=html_content_list[0]
-                    html_string += '<a href="#part' + str(index) +'"></a>'
+                    html_string += '<a name="part' + str(index) +'"></a>'
                     html_string += '<h1>' + os.path.basename(d) + '</h1>'
 
                     html_string += str(soup)
@@ -222,7 +228,12 @@ class MyGui(QMainWindow):
                            function qt5MouseClick() {
                             pyjs.myMouseClick( myurl ,function (res) {  
                            });
-                           }        
+                           }       
+
+                           function QTscrollTo(hash) {
+                             
+                               location.hash = "#" + hash;
+                           } 
                    const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
                	const byteCharacters = atob(b64Data);
                	const byteArrays = [];
@@ -305,13 +316,14 @@ class MyGui(QMainWindow):
             self.widget_2.page().setWebChannel(channel)
 
             self.treeWidget.expandAll()
-
+            #self.widget_2.scroll(0,0)
             if platform == "linux" or platform == "linux2":
                 self.widget_2.load(QUrl('file://' + file_path))
             elif platform == "darwin":
                 self.widget_2.load(QUrl('file://' + file_path))
             elif platform == "win32":
                 self.widget_2.load(QUrl(file_path))
+           
             self.treeWidget.expandAll()
             self.widget_2.show()
 
@@ -320,6 +332,7 @@ class MyGui(QMainWindow):
         ui_path = os.path.join(os.path.dirname(__file__), 'ui/mainForm.ui')
         ico_path = os.path.join(os.path.dirname(__file__), 'ui/maple-leaf.png')
         loadUi(ui_path, self)
+        self.pushButton.clicked.connect(self.on_search_click)
         self.start_check_dict()
         self.comboBox.currentIndexChanged.connect(self.on_changeWord)
         self.setWindowIcon(QtGui.QIcon(ico_path))
