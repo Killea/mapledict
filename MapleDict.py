@@ -107,13 +107,13 @@ class MyGui(QMainWindow):
         if word == '':
             word = self.comboBox.currentText()
             print('word = ', word)
-        for d in all_dict:
+        for index, d in  enumerate(all_dict) :
 
             builder = IndexBuilder(d)
             # html content
 
             html_content_list = builder.mdx_lookup(word)
-            print('html_content_list', html_content_list)
+            #print('html_content_list', html_content_list)
 
             # print(self.comboBox.currentText(), d , result_list)
 
@@ -167,7 +167,7 @@ class MyGui(QMainWindow):
 
                 if html_content_list[0] != '':
                     # html_string +=html_content_list[0]
-
+                    html_string += '<a href="#part' + str(index) +'"></a>'
                     html_string += '<h1>' + os.path.basename(d) + '</h1>'
 
                     html_string += str(soup)

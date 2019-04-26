@@ -6,6 +6,9 @@
 __pycache__
 temp
 .idea
-content
+content/*
+!content/gcide.mdx
+!content/gcide.mdx.db
 build
 dist
+

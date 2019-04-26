@@ -30,7 +30,7 @@ player = vlc.MediaPlayer("D:/mapledict/temp/t.spx")
 player.play()
 '''
 
-
+'''
 with open('D:/mapledict/temp/t.spx', 'rb') as f:
     data = f.read()
     print(data)
@@ -39,5 +39,12 @@ with open("D:/mapledict/temp/t.spx", "rb") as binary_file:
     # Read the whole file at once
     data = binary_file.read()
     print(data)
+'''
 
-    
+import json
+
+with open ('z.json','rb') as text:
+    json_file = text.read()
+    dict1 = json.loads(json_file)
+
+    print(dict1)
