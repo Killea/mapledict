@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['MapleDict.py'],
-             pathex=['/media/hank/1000G/mapledict'],
+             pathex=['D:\\mapledict'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -26,7 +26,7 @@ exe = EXE(pyz,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          console=True )
+          console=False , icon='D:\\mapledict\\dist\\MapleDict\\ui\\maple.ico')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,

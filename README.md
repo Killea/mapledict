@@ -5,6 +5,7 @@ Mapledict is crossplatform, which will provide releases for Windows, Linux and M
 
 #How to use 
 We will provide releases for different platforms. 
-However, if you have python3 installed, you can put mdx files into the doc folder and run the main.py script.
+You just need to put mdx and mdd files into the content folder
+However, if you have python3 installed, you can just run the MapleDict.py script.
 
 
