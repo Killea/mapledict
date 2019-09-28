@@ -1,4 +1,3 @@
-
 '''
 import pyttsx3
 engine = pyttsx3.init()
@@ -11,7 +10,6 @@ engine.runAndWait()
 engine.stop()
 '''
 
-
 '''
 from kivy.core.audio import SoundLoader
 
@@ -22,7 +20,6 @@ if sound:
     sound.play()
     '''
 
-
 '''
 import vlc
 
@@ -31,16 +28,6 @@ player.play()
 '''
 
 '''
-with open('D:/mapledict/temp/t.spx', 'rb') as f:
-    data = f.read()
-    print(data)
-
-with open("D:/mapledict/temp/t.spx", "rb") as binary_file:
-    # Read the whole file at once
-    data = binary_file.read()
-    print(data)
-'''
-
 import json
 
 with open ('z.json','rb') as text:
@@ -48,3 +35,22 @@ with open ('z.json','rb') as text:
     dict1 = json.loads(json_file)
 
     print(dict1)
+'''
+
+'''
+import time
+start = time.time()
+from pattern.en import lemma
+
+
+print(lemma('foods'))
+
+#long running
+#do something other
+end = time.time()
+print (end-start)
+'''
+
+import spell
+
+print(spell.correction('speling'))

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>990</width>
+    <height>793</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Mapledict</string>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonFollowStyle</enum>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QWebEngineView" name="widget_2" native="true">
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>990</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionZoom"/>
+    <addaction name="actionZoom_out"/>
+    <addaction name="separator"/>
+    <addaction name="action"/>
+    <addaction name="actionAlways_on_top"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionManage_dictionaries"/>
+    <addaction name="actionPreference"/>
+   </widget>
+   <widget class="QMenu" name="menuSerarch">
+    <property name="title">
+     <string>Serarch</string>
+    </property>
+    <addaction name="actionIn_page_search"/>
+    <addaction name="actionFull_text_search"/>
+   </widget>
+   <widget class="QMenu" name="menuAccount">
+    <property name="title">
+     <string>Account</string>
+    </property>
+    <addaction name="actionLogin"/>
+    <addaction name="actionLog_out"/>
+    <addaction name="actionSync"/>
+    <addaction name="separator"/>
+    <addaction name="actionNoteboook"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionMapleDict_help"/>
+    <addaction name="actionHome_page"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAbout_2"/>
+   </widget>
+   <widget class="QMenu" name="menuPlugins">
+    <property name="title">
+     <string>Plugins</string>
+    </property>
+    <widget class="QMenu" name="menuAudio_player">
+     <property name="title">
+      <string>Audio player</string>
+     </property>
+     <addaction name="actionPlay_all_audios_in_this_page"/>
+     <addaction name="actionWord_list_for_playing"/>
+    </widget>
+    <addaction name="actionExport"/>
+    <addaction name="menuAudio_player"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuSerarch"/>
+   <addaction name="menuPlugins"/>
+   <addaction name="menuAccount"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionZoom">
+   <property name="text">
+    <string>Zoom in</string>
+   </property>
+  </action>
+  <action name="actionZoom_out">
+   <property name="text">
+    <string>Zoom out</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>Menu bar</string>
+   </property>
+  </action>
+  <action name="actionAlways_on_top">
+   <property name="text">
+    <string>Always on top</string>
+   </property>
+  </action>
+  <action name="actionManage_dictionaries">
+   <property name="text">
+    <string>Manage dictionaries...</string>
+   </property>
+  </action>
+  <action name="actionPreference">
+   <property name="text">
+    <string>Preference...</string>
+   </property>
+  </action>
+  <action name="actionIn_page_search">
+   <property name="text">
+    <string>In page search</string>
+   </property>
+  </action>
+  <action name="actionFull_text_search">
+   <property name="text">
+    <string>Full text search</string>
+   </property>
+  </action>
+  <action name="actionLogin">
+   <property name="text">
+    <string>Login</string>
+   </property>
+  </action>
+  <action name="actionSync">
+   <property name="text">
+    <string>Sync</string>
+   </property>
+  </action>
+  <action name="actionNotebook">
+   <property name="text">
+    <string>Notebook</string>
+   </property>
+  </action>
+  <action name="actionMapleDict_help">
+   <property name="text">
+    <string>MapleDict help</string>
+   </property>
+  </action>
+  <action name="actionHome_page">
+   <property name="text">
+    <string>Home page</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionAbout_2">
+   <property name="text">
+    <string>About MapleDict</string>
+   </property>
+  </action>
+  <action name="actionNoteboook">
+   <property name="text">
+    <string>Noteboook</string>
+   </property>
+  </action>
+  <action name="actionLog_out">
+   <property name="text">
+    <string>Log out</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="actionPlay_all_audios_in_this_page">
+   <property name="text">
+    <string>Play all audios in this page</string>
+   </property>
+  </action>
+  <action name="actionWord_list_for_playing">
+   <property name="text">
+    <string>Show player...</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QWebEngineView</class>
+   <extends>QWidget</extends>
+   <header>qwebengineview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

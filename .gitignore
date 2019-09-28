@@ -12,5 +12,4 @@ content/*
 build
 dist
 .vscoce
-
-
+.vscode/launch.json
